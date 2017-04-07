@@ -49,6 +49,19 @@
 //
 // Release Notes
 //
+// 2.0.0 (develop branch)
+//
+// Primary objective:
+// * Add ability to read existing Podcast feeds.
+//
+// Todo:
+// * finish implementing custom UnmarhalXML and MarshalXML work.
+// * add logic to handle <rss> root element (Breaking Changes?).
+// * if we have to make a breaking change, rename Podcast -> Channel.
+// * add Examples for reading existing Feeds.
+// * determine if we should blow up, or allow malformed feeds?
+// * update README.
+//
 // 1.3.1
 // * increased itunes compliance after feedback from Apple:
 // - specified what categories should be set with AddCategory().
