@@ -34,10 +34,26 @@ fields have been grouped by RSS 2.0 and iTunes fields.
 
 iTunes specific fields are all prefixed with the letter `I`.
 
+The only limitation you may run into is with formatting of certain fields, such
+as Enclosure.EnclosureType and Item.PubDate.  You should really let the package
+handle these for you as it would remain compliant.
+
 ### References
 RSS 2.0: <a href="https://cyber.harvard.edu/rss/rss.html">https://cyber.harvard.edu/rss/rss.html</a>
 
 Podcasts: <a href="https://help.apple.com/itc/podcasts_connect/#/itca5b22233">https://help.apple.com/itc/podcasts_connect/#/itca5b22233</a>
+
+### Contributing
+Use standard git-flow patterns here.
+
+* "develop" should remain stable and releasable at all times (100% code coverage,
+full Examples, doc.go updated, etc).
+* Branch from "develop" into your feature or bug branch.
+* Create a PR against "develop" branch.
+
+In addition, I ask that you rebase from "develop" and Squash all of your commits
+into a single commit. (git rebase -i origin/develop)  I like single clean code
+commits into develop and master to track what changed, by who and when.
 
 ### Final Release
 This project is now in maintenance mode.  This means no more planned releases expected.
@@ -139,6 +155,7 @@ Todo:
   * [func (p \*Podcast) Bytes() []byte](#Podcast.Bytes)
   * [func (p \*Podcast) Encode(w io.Writer) error](#Podcast.Encode)
   * [func (p \*Podcast) String() string](#Podcast.String)
+  * [func (p \*Podcast) UnmarshalXML(d \*xml.Decoder, start xml.StartElement) error](#Podcast.UnmarshalXML)
 * [type TextInput](#TextInput)
 
 #### <a name="pkg-examples">Examples</a>
@@ -668,6 +685,12 @@ Encode writes the bytes to the io.Writer stream in RSS 2.0 specification.
 func (p *Podcast) String() string
 ```
 String encodes the Podcast state to a string.
+
+### <a name="Podcast.UnmarshalXML">func</a> (\*Podcast) [UnmarshalXML](./podcast.go#L409)
+``` go
+func (p *Podcast) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
+```
+UnmarshalXML handles the custom formatting to a strongly typed value.
 
 ## <a name="TextInput">type</a> [TextInput](./textinput.go#L6-L12)
 ``` go
