@@ -47,7 +47,12 @@ type Item struct {
 	IExplicit          string `xml:"itunes:explicit,omitempty"`
 	IIsClosedCaptioned string `xml:"itunes:isClosedCaptioned,omitempty"`
 	IOrder             string `xml:"itunes:order,omitempty"`
-	IEpisode           string `xml:"itunes:episode,omitempty"`
+
+	// Situational tags
+	IEpisodeType string `xml:"itunes:episodeType,omitempty"`
+	IEpisode     string `xml:"itunes:episode,omitempty"`
+	ISeason      string `xml:"itunes:season,omitempty"`
+	ITitle       string `xml:"itunes:title,omitempty"`
 }
 
 // AddEnclosure adds the downloadable asset to the podcast Item.

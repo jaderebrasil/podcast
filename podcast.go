@@ -53,6 +53,9 @@ type Podcast struct {
 	IOwner      *Author // Author is formatted for itunes as-is
 	ICategories []*ICategory
 
+	// Situational Tags
+	IType string `xml:"itunes:type,omitempty"`
+
 	Items []*Item
 
 	encode func(w io.Writer, o interface{}) error
