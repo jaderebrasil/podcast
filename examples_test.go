@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/jaderebrasil/podcast"
+	"github.com/eduncan911/podcast"
 )
 
 func ExampleNew() {
