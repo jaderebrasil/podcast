@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/eduncan911/podcast"
+	"github.com/jaderebrasil/podcast"
 )
 
 

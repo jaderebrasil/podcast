@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/eduncan911/podcast"
+	"github.com/jaderebrasil/podcast"
 )
 
 var (
