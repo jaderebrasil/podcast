@@ -1,25 +1,26 @@
-package podcast
+package podcast_test
 
 import (
 	"testing"
 
+	"github.com/eduncan911/podcast"
 	"github.com/stretchr/testify/assert"
 )
 
 type enclosureTest struct {
-	t        EnclosureType
+	t        podcast.EnclosureType
 	expected string
 }
 
 var enclosureTests = []enclosureTest{
-	enclosureTest{M4A, "audio/x-m4a"},
-	enclosureTest{M4V, "video/x-m4v"},
-	enclosureTest{MP4, "video/mp4"},
-	enclosureTest{MP3, "audio/mpeg"},
-	enclosureTest{MOV, "video/quicktime"},
-	enclosureTest{PDF, "application/pdf"},
-	enclosureTest{EPUB, "document/x-epub"},
-	enclosureTest{M4A, "audio/x-m4a"},
+	enclosureTest{podcast.M4A, "audio/x-m4a"},
+	enclosureTest{podcast.M4V, "video/x-m4v"},
+	enclosureTest{podcast.MP4, "video/mp4"},
+	enclosureTest{podcast.MP3, "audio/mpeg"},
+	enclosureTest{podcast.MOV, "video/quicktime"},
+	enclosureTest{podcast.PDF, "application/pdf"},
+	enclosureTest{podcast.EPUB, "document/x-epub"},
+	enclosureTest{podcast.M4A, "audio/x-m4a"},
 	enclosureTest{99, "application/octet-stream"},
 }
 
