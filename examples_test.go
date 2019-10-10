@@ -8,6 +8,8 @@ import (
 	"github.com/eduncan911/podcast"
 )
 
+
+
 func ExampleNew() {
 	ti, l, d := "title", "link", "description"
 

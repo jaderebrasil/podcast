@@ -6,8 +6,15 @@ import (
 	"net/http/httptest"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/eduncan911/podcast"
+)
+
+var (
+	createdDate = time.Date(2017, time.February, 1, 8, 21, 52, 0, time.UTC)
+	updatedDate = createdDate.AddDate(0, 0, 5)
+	pubDate     = createdDate.AddDate(0, 0, 3)
 )
 
 func Example_httpHandlers() {
