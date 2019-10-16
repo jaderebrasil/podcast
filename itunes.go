@@ -29,6 +29,6 @@ type IImage struct {
 //
 // This is rendered as CDATA which allows for HTML tags such as <a href="">.
 type ISummary struct {
-	XMLName xml.Name `xml:"itunes:summary"`
+	XMLName xml.Name `xml:"description"` //`xml:"itunes:summary"`
 	Text    string   `xml:",cdata"`
 }

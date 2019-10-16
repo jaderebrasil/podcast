@@ -28,7 +28,7 @@ type Item struct {
 	GUID             string     `xml:"guid"`
 	Title            string     `xml:"title"`
 	Link             string     `xml:"link"`
-	Description      string     `xml:"description"`
+	Description      string     `xml:"itunes:summary"` //`xml:"description"`
 	Author           *Author    `xml:"-"`
 	AuthorFormatted  string     `xml:"author,omitempty"`
 	Category         string     `xml:"category,omitempty"`
