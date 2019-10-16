@@ -78,7 +78,7 @@ func New(title, link, description string,
 		// setup dependency (could inject later)
 		encode: encoder,
 	}
-	pod.AddDescription(desc)
+	pod.AddDescription(description)
 	return pod
 }
 
