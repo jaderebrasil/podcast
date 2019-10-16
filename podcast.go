@@ -18,24 +18,24 @@ const (
 
 // Podcast represents a podcast.
 type Podcast struct {
-	XMLName        xml.Name `xml:"channel"`
-	Title          string   `xml:"title"`
-	Link           string   `xml:"link"`
-	Description    string   `xml:"description"`
-	Category       string   `xml:"category,omitempty"`
-	Cloud          string   `xml:"cloud,omitempty"`
-	Copyright      string   `xml:"copyright,omitempty"`
-	Docs           string   `xml:"docs,omitempty"`
-	Generator      string   `xml:"generator,omitempty"`
-	Language       string   `xml:"language,omitempty"`
-	LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
-	ManagingEditor string   `xml:"managingEditor,omitempty"`
-	PubDate        string   `xml:"pubDate,omitempty"`
-	Rating         string   `xml:"rating,omitempty"`
-	SkipHours      string   `xml:"skipHours,omitempty"`
-	SkipDays       string   `xml:"skipDays,omitempty"`
-	TTL            int      `xml:"ttl,omitempty"`
-	WebMaster      string   `xml:"webMaster,omitempty"`
+	XMLName        xml.Name     `xml:"channel"`
+	Title          string       `xml:"title"`
+	Link           string       `xml:"link"`
+	Description    *Description //string   `xml:"description"`
+	Category       string       `xml:"category,omitempty"`
+	Cloud          string       `xml:"cloud,omitempty"`
+	Copyright      string       `xml:"copyright,omitempty"`
+	Docs           string       `xml:"docs,omitempty"`
+	Generator      string       `xml:"generator,omitempty"`
+	Language       string       `xml:"language,omitempty"`
+	LastBuildDate  string       `xml:"lastBuildDate,omitempty"`
+	ManagingEditor string       `xml:"managingEditor,omitempty"`
+	PubDate        string       `xml:"pubDate,omitempty"`
+	Rating         string       `xml:"rating,omitempty"`
+	SkipHours      string       `xml:"skipHours,omitempty"`
+	SkipDays       string       `xml:"skipDays,omitempty"`
+	TTL            int          `xml:"ttl,omitempty"`
+	WebMaster      string       `xml:"webMaster,omitempty"`
 	Image          *Image
 	TextInput      *TextInput
 	AtomLink       *AtomLink
@@ -67,10 +67,9 @@ type Podcast struct {
 // to the expected proper formats.
 func New(title, link, description string,
 	pubDate, lastBuildDate *time.Time) Podcast {
-	return Podcast{
+	pod := Podcast{
 		Title:         title,
 		Link:          link,
-		Description:   description,
 		Generator:     fmt.Sprintf("go podcast v%s (github.com/eduncan911/podcast)", pVersion),
 		PubDate:       parseDateRFC1123Z(pubDate),
 		LastBuildDate: parseDateRFC1123Z(lastBuildDate),
@@ -79,6 +78,8 @@ func New(title, link, description string,
 		// setup dependency (could inject later)
 		encode: encoder,
 	}
+	pod.AddDescription(desc)
+	return pod
 }
 
 // AddAuthor adds the specified Author to the podcast.
@@ -269,7 +270,7 @@ func (p *Podcast) AddImage(url string) {
 //
 func (p *Podcast) AddItem(i Item) (int, error) {
 	// initial guards for required fields
-	if len(i.Title) == 0 || len(i.Description) == 0 {
+	if len(i.Title) == 0 || len(i.Description.Text) == 0 {
 		return len(p.Items), errors.New("Title and Description are required")
 	}
 	if i.Enclosure != nil {
@@ -402,6 +403,23 @@ func (p *Podcast) Encode(w io.Writer) error {
 		Channel:  p,
 	}
 	return p.encode(w, wrapped)
+}
+
+// AddDescription adds the Description.
+//
+// Limit: 4000 characters
+//
+// Note that this field is a CDATA encoded field which allows for rich text
+// such as html links: <a href="http://www.apple.com">Apple</a>.
+func (p *Podcast) AddDescription(desc string) {
+	count := utf8.RuneCountInString(desc)
+	if count > 4000 {
+		s := []rune(desc)
+		desc = string(s[0:4000])
+	}
+	p.Description = &Description{
+		Text: desc,
+	}
 }
 
 // String encodes the Podcast state to a string.

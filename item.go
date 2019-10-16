@@ -24,24 +24,24 @@ import (
 // - Always set an Enclosure.Length, to be nice to your downloaders.
 // - Use Enclosure.Type instead of setting TypeFormatted for valid extensions.
 type Item struct {
-	XMLName          xml.Name   `xml:"item"`
-	GUID             string     `xml:"guid"`
-	Title            string     `xml:"title"`
-	Link             string     `xml:"link"`
-	Description      string     `xml:"description"`
-	Author           *Author    `xml:"-"`
-	AuthorFormatted  string     `xml:"author,omitempty"`
-	Category         string     `xml:"category,omitempty"`
-	Comments         string     `xml:"comments,omitempty"`
-	Source           string     `xml:"source,omitempty"`
-	PubDate          *time.Time `xml:"-"`
-	PubDateFormatted string     `xml:"pubDate,omitempty"`
+	XMLName          xml.Name     `xml:"item"`
+	GUID             string       `xml:"guid"`
+	Title            string       `xml:"title"`
+	Link             string       `xml:"link"`
+	Description      *Description //string     `xml:"description"`
+	Author           *Author      `xml:"-"`
+	AuthorFormatted  string       `xml:"author,omitempty"`
+	Category         string       `xml:"category,omitempty"`
+	Comments         string       `xml:"comments,omitempty"`
+	Source           string       `xml:"source,omitempty"`
+	PubDate          *time.Time   `xml:"-"`
+	PubDateFormatted string       `xml:"pubDate,omitempty"`
 	Enclosure        *Enclosure
 
 	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 	IAuthor            string `xml:"itunes:author,omitempty"`
 	ISubtitle          string `xml:"itunes:subtitle,omitempty"`
-	ISummary           *ISummary
+	ISummary           string `xml:"itunes:summary"` //*ISummary
 	IImage             *IImage
 	IDuration          string `xml:"itunes:duration,omitempty"`
 	IExplicit          string `xml:"itunes:explicit,omitempty"`
@@ -100,9 +100,10 @@ func (i *Item) AddSummary(summary string) {
 		s := []rune(summary)
 		summary = string(s[0:4000])
 	}
-	i.ISummary = &ISummary{
-		Text: summary,
-	}
+	i.ISummary = summary
+	// i.ISummary = &ISummary{
+	// 	Text: summary,
+	// }
 }
 
 // AddDuration adds the duration to the iTunes duration field.
@@ -111,4 +112,21 @@ func (i *Item) AddDuration(durationInSeconds int64) {
 		return
 	}
 	i.IDuration = parseDuration(durationInSeconds)
+}
+
+// AddDescription adds the Description.
+//
+// Limit: 4000 characters
+//
+// Note that this field is a CDATA encoded field which allows for rich text
+// such as html links: <a href="http://www.apple.com">Apple</a>.
+func (i *Item) AddDescription(desc string) {
+	count := utf8.RuneCountInString(desc)
+	if count > 4000 {
+		s := []rune(desc)
+		desc = string(s[0:4000])
+	}
+	i.Description = &Description{
+		Text: desc,
+	}
 }

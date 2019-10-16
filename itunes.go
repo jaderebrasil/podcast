@@ -32,3 +32,10 @@ type ISummary struct {
 	XMLName xml.Name `xml:"itunes:summary"`
 	Text    string   `xml:",cdata"`
 }
+
+// Description object adds CDATA on Description xml tag - https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+// itunes:summary can't have CDATA html anymore
+type Description struct {
+	XMLName xml.Name `xml:"description"`
+	Text    string   `xml:",cdata"`
+}
