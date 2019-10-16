@@ -41,7 +41,7 @@ type Item struct {
 	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 	IAuthor            string `xml:"itunes:author,omitempty"`
 	ISubtitle          string `xml:"itunes:subtitle,omitempty"`
-	ISummary           string `xml:"itunes:summary"` //*ISummary
+	ISummary           string `xml:"itunes:summary,omitempty"` //*ISummary
 	IImage             *IImage
 	IDuration          string `xml:"itunes:duration,omitempty"`
 	IExplicit          string `xml:"itunes:explicit,omitempty"`
