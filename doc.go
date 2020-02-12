@@ -15,11 +15,19 @@
 // logic required to comply with the specifications and ensure a compliant feed.
 // A number of overrides occur to help with iTunes visibility of your episodes.
 //
-// Notably, the [Podcast.AddItem(i Item)](#Podcast.AddItem) function performs most
-// of the heavy lifting by taking the [Item](#Item) input and performing
+// Notably, the `Podcast.AddItem` function performs most
+// of the heavy lifting by taking the `Item` input and performing
 // validation, overrides and duplicate setters through the feed.
 //
 // Full detailed Examples of the API are at https://godoc.org/github.com/eduncan911/podcast.
+//
+// Go Modules and Go 1.7+
+//
+// This library is supported on GoLang 1.7 and higher.
+//
+// We have implemented Go Modules support and the CI pipeline shows it working with
+// new installs.  To keep 1.7 compatibility, we use `go mod vendor` to maintain the
+// `vendor/` folder for older 1.7 and later runtimes.
 //
 // Extensibility
 //
@@ -35,48 +43,72 @@
 //
 // Podcasts: https://help.apple.com/itc/podcasts_connect/#/itca5b22233
 //
-// Final Release
+// Roadmap
 //
-// This project is now in maintenance mode.  This means no more planned releases expected.
+// The 1.x branch is now mostly in maintenance mode, open to PRs.  This means no
+// more planned features on the 1.x feature branch is expected. With the success of 6
+// iTunes-accepted podcasts I have published with this library, and with the feedback from
+// the community, the 1.x releases are now considered stable.
 //
-// With the success of 6 iTunes-accepted podcasts I have published with this library, and
-// with the feedback from the community, this library is now considered stable and complete.
+// The 2.x branch's primary focus is to allow for bi-direction marshalling both ways.
+// Currently, the 1.x branch only allows unmarshalling to a serial feed.  An attempt to marshall
+// a serialized feed back into a Podcast form will error or not work correctly.  Note that while
+// the 2.x branch is targeted to remain backwards compatible, it is true if using the public
+// API funcs to set parameters only.  Several of the underlying public fields are being removed
+// in order to accommodate the marshalling of serialized data.  Therefore, a version 2.x is denoted
+// for this release.
 //
-// Feel free to open an issue, file a bug or suggest a non-breaking enhancement and I will
-// address it as soon as possible.
+// Versioning
 //
-// Thank you!
+// We use SemVer versioning schema.  You can rest assured that pulling 1.x branches will
+// remain backwards compatible now and into the future.
+//
+// However, the new 2.x branch, while keeping the same API, is expected break those that
+// bypass the API methods and use the underlying public properties instead.
 //
 // Release Notes
 //
+// 1.4.0
+//   * Add Go Modules, Update vendor folder (#26, #25)
+//   * Add C.I. GitHub Actions (#25)
+//   * Add additional error checks found by linters (#25)
+//   * Go Fmt enclosure_test.go (#25)
+//
+// 1.3.2
+//   * Correct count len of UTF8 strings (#9)
+//   * Implement duration parser (#8)
+//   * Fix Github and GoDocs Markdown (#14)
+//   * Move podcast.go Private Methods to Respected Files (#12)
+//   * Allow providing GUID on Podcast (#15)
+//
 // 1.3.1
-// * increased itunes compliance after feedback from Apple:
-// - specified what categories should be set with AddCategory().
-// - enforced title and link as part of Image.
-// * added Podcast.AddAtomLink() for more broad compliance to readers.
+//   * increased itunes compliance after feedback from Apple:
+//     - specified what categories should be set with AddCategory().
+//     - enforced title and link as part of Image.
+//   * added Podcast.AddAtomLink() for more broad compliance to readers.
 //
 // 1.3.0
-// * fixes Item.Duration being set incorrectly.
-// * changed Item.AddEnclosure() parameter definition (Bytes not Seconds!).
-// * added Item.AddDuration formatting and override.
-// * added more documentation surrounding Item.Enclosure{}
+//   * fixes Item.Duration being set incorrectly.
+//   * changed Item.AddEnclosure() parameter definition (Bytes not Seconds!).
+//   * added Item.AddDuration formatting and override.
+//   * added more documentation surrounding Item.Enclosure{}
 //
 // 1.2.1
-// * added Podcast.AddSubTitle() and truncating to 64 chars.
-// * added a number of Guards to protect against empty fields.
+//   * added Podcast.AddSubTitle() and truncating to 64 chars.
+//   * added a number of Guards to protect against empty fields.
 //
 // 1.2.0
-// * added Podcast.AddPubDate() and Podcast.AddLastBuildDate() overrides.
-// * added Item.AddImage() to mask some cumbersome addition of IImage.
-// * added Item.AddPubDate to simply datetime setters.
-// * added more examples (mostly around Item struct).
-// * tweaked some documentation.
+//   * added Podcast.AddPubDate() and Podcast.AddLastBuildDate() overrides.
+//   * added Item.AddImage() to mask some cumbersome addition of IImage.
+//   * added Item.AddPubDate to simply datetime setters.
+//   * added more examples (mostly around Item struct).
+//   * tweaked some documentation.
 //
 // 1.1.0
-// * Enabling CDATA in ISummary fields for Podcast and Channel.
+//   * Enabling CDATA in ISummary fields for Podcast and Channel.
 //
 // 1.0.0
-// * Initial release.
-// * Full documentation, full examples and complete code coverage.
+//   * Initial release.
+//   * Full documentation, full examples and complete code coverage.
 //
 package podcast

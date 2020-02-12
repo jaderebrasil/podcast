@@ -116,73 +116,73 @@ func (p *Podcast) AddAtomLink(href string) {
 // used and will invalidate the feed if deviated from the list.  That list is
 // as follows.
 //
-// Arts
-// * Design
-// * Fashion & Beauty
-// * Food
-// * Literature
-// * Performing Arts
-// * Visual Arts
-// Business
-// * Business News
-// * Careers
-// * Investing
-// * Management & Marketing
-// * Shopping
-// Comedy
-// Education
-// * Education Technology
-// * Higher Education
-// * K-12
-// * Language Courses
-// * Training
-// Games & Hobbies
-// * Automotive
-// * Aviation
-// * Hobbies
-// * Other Games
-// * Video Games
-// Government & Organizations
-// * Local
-// * National
-// * Non-Profit
-// * Regional
-// Health
-// * Alternative Health
-// * Fitness & Nutrition
-// * Self-Help
-// * Sexuality
-// Kids & Family
-// Music
-// News & Politics
-// Religion & Spirituality
-// * Buddhism
-// * Christianity
-// * Hinduism
-// * Islam
-// * Judaism
-// * Other
-// * Spirituality
-// Science & Medicine
-// * Medicine
-// * Natural Sciences
-// * Social Sciences
-// Society & Culture
-// * History
-// * Personal Journals
-// * Philosophy
-// * Places & Travel
-// Sports & Recreation
-// * Amateur
-// * College & High School
-// * Outdoor
-// * Professional
-// Technology
-// * Gadgets
-// * Podcasting
-// * Software How-To
-// * Tech News
-// TV & Film
+//   * Arts
+//     * Design
+//     * Fashion & Beauty
+//     * Food
+//     * Literature
+//     * Performing Arts
+//     * Visual Arts
+//   * Business
+//     * Business News
+//     * Careers
+//     * Investing
+//     * Management & Marketing
+//     * Shopping
+//   * Comedy
+//   * Education
+//     * Education Technology
+//     * Higher Education
+//     * K-12
+//     * Language Courses
+//     * Training
+//   * Games & Hobbies
+//     * Automotive
+//     * Aviation
+//     * Hobbies
+//     * Other Games
+//     * Video Games
+//   * Government & Organizations
+//     * Local
+//     * National
+//     * Non-Profit
+//     * Regional
+//   * Health
+//     * Alternative Health
+//     * Fitness & Nutrition
+//     * Self-Help
+//     * Sexuality
+//   * Kids & Family
+//   * Music
+//   * News & Politics
+//   * Religion & Spirituality
+//     * Buddhism
+//     * Christianity
+//     * Hinduism
+//     * Islam
+//     * Judaism
+//     * Other
+//     * Spirituality
+//   * Science & Medicine
+//     * Medicine
+//     * Natural Sciences
+//     * Social Sciences
+//   * Society & Culture
+//     * History
+//     * Personal Journals
+//     * Philosophy
+//     * Places & Travel
+//   * Sports & Recreation
+//     * Amateur
+//     * College & High School
+//     * Outdoor
+//     * Professional
+//   * Technology
+//     * Gadgets
+//     * Podcasting
+//     * Software How-To
+//     * Tech News
+//   * TV & Film
 func (p *Podcast) AddCategory(category string, subCategories []string) {
 	if len(category) == 0 {
 		return
@@ -232,7 +232,7 @@ func (p *Podcast) AddImage(url string) {
 // This method takes the "itunes overrides" approach to populating
 // itunes tags according to the overrides rules in the specification.
 // This not only complies completely with iTunes parsing rules; but, it also
-// displays what is possible to be set on an individual episode level - if you
+// displays what is possible to be set on an individual episode level – if you
 // wish to have more fine grain control over your content.
 //
 // This method imposes strict validation of the Item being added to confirm
@@ -240,32 +240,32 @@ func (p *Podcast) AddImage(url string) {
 //
 // Article minimal requirements are:
 //
-// * Title
-// * Description
-// * Link
+//   * Title
+//   * Description
+//   * Link
 //
 // Audio, Video and Downloads minimal requirements are:
 //
-// * Title
-// * Description
-// * Enclosure (HREF, Type and Length all required)
+//   * Title
+//   * Description
+//   * Enclosure (HREF, Type and Length all required)
 //
 // The following fields are always overwritten (don't set them):
 //
-// * GUID
-// * PubDateFormatted
-// * AuthorFormatted
-// * Enclosure.TypeFormatted
-// * Enclosure.LengthFormatted
+//   * GUID
+//   * PubDateFormatted
+//   * AuthorFormatted
+//   * Enclosure.TypeFormatted
+//   * Enclosure.LengthFormatted
 //
 // Recommendations:
 //
-// * Just set the minimal fields: the rest get set for you.
-// * Always set an Enclosure.Length, to be nice to your downloaders.
-// * Follow Apple's best practices to enrich your podcasts:
-//   https://help.apple.com/itc/podcasts_connect/#/itc2b3780e76
-// * For specifications of itunes tags, see:
-//   https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+//   * Just set the minimal fields: the rest get set for you.
+//   * Always set an Enclosure.Length, to be nice to your downloaders.
+//   * Follow Apple's best practices to enrich your podcasts:
+//     https://help.apple.com/itc/podcasts_connect/#/itc2b3780e76
+//   * For specifications of itunes tags, see:
+//     https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 //
 func (p *Podcast) AddItem(i Item) (int, error) {
 	// initial guards for required fields
@@ -291,7 +291,9 @@ func (p *Podcast) AddItem(i Item) (int, error) {
 	i.PubDateFormatted = parseDateRFC1123Z(i.PubDate)
 	i.AuthorFormatted = parseAuthorNameEmail(i.Author)
 	if i.Enclosure != nil {
-		i.GUID = i.Enclosure.URL // yep, GUID is the Permlink URL
+		if len(i.GUID) == 0 {
+			i.GUID = i.Enclosure.URL // yep, GUID is the Permlink URL
+		}
 
 		if i.Enclosure.Length < 0 {
 			i.Enclosure.Length = 0
@@ -311,12 +313,13 @@ func (p *Podcast) AddItem(i Item) (int, error) {
 	// iTunes it
 	//
 	if len(i.IAuthor) == 0 {
-		if i.Author != nil {
+		switch {
+		case i.Author != nil:
 			i.IAuthor = i.Author.Email
-		} else if len(p.IAuthor) != 0 {
+		case len(p.IAuthor) != 0:
 			i.Author = &Author{Email: p.IAuthor}
 			i.IAuthor = p.IAuthor
-		} else if len(p.ManagingEditor) != 0 {
+		case len(p.ManagingEditor) != 0:
 			i.Author = &Author{Email: p.ManagingEditor}
 			i.IAuthor = p.ManagingEditor
 		}
@@ -367,7 +370,7 @@ func (p *Podcast) AddSubTitle(subTitle string) {
 // Limit: 4000 characters
 //
 // Note that this field is a CDATA encoded field which allows for rich text
-// such as html links: <a href="http://www.apple.com">Apple</a>.
+// such as html links: `<a href="http://www.apple.com">Apple</a>`.
 func (p *Podcast) AddSummary(summary string) {
 	count := utf8.RuneCountInString(summary)
 	if count == 0 {
@@ -389,7 +392,9 @@ func (p *Podcast) Bytes() []byte {
 
 // Encode writes the bytes to the io.Writer stream in RSS 2.0 specification.
 func (p *Podcast) Encode(w io.Writer) error {
-	w.Write([]byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"))
+	if _, err := w.Write([]byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")); err != nil {
+		return errors.Wrap(err, "podcast.Encode: w.Write return error")
+	}
 
 	atomLink := ""
 	if p.AtomLink != nil {
@@ -435,16 +440,9 @@ var encoder = func(w io.Writer, o interface{}) error {
 	e := xml.NewEncoder(w)
 	e.Indent("", "  ")
 	if err := e.Encode(o); err != nil {
-		return errors.Wrap(err, "podcast.encode: Encode returned error")
+		return errors.Wrap(err, "podcast.encoder: e.Encode returned error")
 	}
 	return nil
-}
-
-var parseDateRFC1123Z = func(t *time.Time) string {
-	if t != nil && !t.IsZero() {
-		return t.Format(time.RFC1123Z)
-	}
-	return time.Now().UTC().Format(time.RFC1123Z)
 }
 
 var parseAuthorNameEmail = func(a *Author) string {
@@ -456,32 +454,4 @@ var parseAuthorNameEmail = func(a *Author) string {
 		}
 	}
 	return author
-}
-
-var parseDuration = func(duration int64) string {
-	h := duration / 3600
-	duration = duration % 3600
-
-	m := duration / 60
-	duration = duration % 60
-
-	s := duration
-
-	// HH:MM:SS
-	if h > 9 {
-		return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
-	}
-
-	// H:MM:SS
-	if h > 0 {
-		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
-	}
-
-	// MM:SS
-	if m > 9 {
-		return fmt.Sprintf("%02d:%02d", m, s)
-	}
-
-	// M:SS
-	return fmt.Sprintf("%d:%02d", m, s)
 }

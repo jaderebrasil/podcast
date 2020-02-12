@@ -1,6 +1,7 @@
 package podcast_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -278,6 +279,32 @@ func TestAddItemNoEnclosureGUIDValid(t *testing.T) {
 	assert.EqualValues(t, theLink, p.Items[0].GUID)
 }
 
+func TestAddItemWithEnclosureGUIDSet(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	theLink := "http://someotherurl.com/story.html"
+	theGUID := "someGUID"
+	length := 3
+	p := podcast.New("title", "link", "description", nil, nil)
+	i := podcast.Item{
+		Title:       "title",
+		Description: "desc",
+		GUID:        theGUID,
+	}
+	i.AddEnclosure(theLink, podcast.MP3, int64(length))
+
+	// act
+	added, err := p.AddItem(i)
+
+	// assert
+	assert.EqualValues(t, 1, added)
+	assert.NoError(t, err)
+	assert.Len(t, p.Items, 1)
+	assert.EqualValues(t, theGUID, p.Items[0].GUID)
+	assert.EqualValues(t, length, p.Items[0].Enclosure.Length)
+}
+
 func TestAddItemAuthor(t *testing.T) {
 	t.Parallel()
 
@@ -360,7 +387,7 @@ func TestAddSubTitleTooLong(t *testing.T) {
 		if len(subTitle) >= 80 {
 			break
 		}
-		subTitle = subTitle + "ajd 2 "
+		subTitle += "ajd 2 "
 	}
 
 	// act
@@ -384,7 +411,7 @@ func TestAddSummaryTooLong(t *testing.T) {
 		if len(summary) >= 4051 {
 			break
 		}
-		summary = summary + "jax ss 7 "
+		summary += "jax ss 7 "
 	}
 
 	// act
@@ -405,4 +432,24 @@ func TestAddSummaryEmpty(t *testing.T) {
 
 	// assert
 	assert.Nil(t, p.ISummary)
+}
+
+type errWriter struct{}
+
+func (w errWriter) Write(p []byte) (n int, err error) {
+	return 0, errors.New("it was bad")
+}
+
+func TestEncodeWriterError(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	p := podcast.New("title", "desc", "Link", nil, nil)
+
+	// act
+	err := p.Encode(&errWriter{})
+
+	// assert
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "w.Write return error")
 }
