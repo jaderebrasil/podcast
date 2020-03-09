@@ -2,7 +2,6 @@ package podcast
 
 import (
 	"encoding/xml"
-	"fmt"
 	"time"
 	"unicode/utf8"
 )
@@ -29,7 +28,6 @@ type Item struct {
 	GUID             string     `xml:"guid"`
 	Title            string     `xml:"title"`
 	Link             string     `xml:"link"`
-	Description      string     `xml:"itunes:summary"` //`xml:"description"`
 	Author           *Author    `xml:"-"`
 	AuthorFormatted  string     `xml:"author,omitempty"`
 	Category         string     `xml:"category,omitempty"`
@@ -42,7 +40,7 @@ type Item struct {
 	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 	IAuthor            string `xml:"itunes:author,omitempty"`
 	ISubtitle          string `xml:"itunes:subtitle,omitempty"`
-	ISummary           *ISummary
+	ISummary           string `xml:"itunes:summary,omitempty"` //*ISummary
 	IImage             *IImage
 	IDuration          string `xml:"itunes:duration,omitempty"`
 	IExplicit          string `xml:"itunes:explicit,omitempty"`
@@ -54,6 +52,10 @@ type Item struct {
 	IEpisode     string `xml:"itunes:episode,omitempty"`
 	ISeason      string `xml:"itunes:season,omitempty"`
 	ITitle       string `xml:"itunes:title,omitempty"`
+
+	// Description
+	Description *Description //string     `xml:"description"`
+
 }
 
 // AddEnclosure adds the downloadable asset to the podcast Item.
@@ -101,9 +103,10 @@ func (i *Item) AddSummary(summary string) {
 		s := []rune(summary)
 		summary = string(s[0:4000])
 	}
-	i.ISummary = &ISummary{
-		Text: summary,
-	}
+	i.ISummary = summary
+	// i.ISummary = &ISummary{
+	// 	Text: summary,
+	// }
 }
 
 // AddDuration adds the duration to the iTunes duration field.
@@ -114,37 +117,19 @@ func (i *Item) AddDuration(durationInSeconds int64) {
 	i.IDuration = parseDuration(durationInSeconds)
 }
 
-var parseDuration = func(duration int64) string {
-	h := duration / 3600
-	duration = duration % 3600
-
-	m := duration / 60
-	duration = duration % 60
-
-	s := duration
-
-	// HH:MM:SS
-	if h > 9 {
-		return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+// AddDescription adds the Description.
+//
+// Limit: 4000 characters
+//
+// Note that this field is a CDATA encoded field which allows for rich text
+// such as html links: <a href="http://www.apple.com">Apple</a>.
+func (i *Item) AddDescription(desc string) {
+	count := utf8.RuneCountInString(desc)
+	if count > 4000 {
+		s := []rune(desc)
+		desc = string(s[0:4000])
 	}
-
-	// H:MM:SS
-	if h > 0 {
-		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
+	i.Description = &Description{
+		Text: desc,
 	}
-
-	// MM:SS
-	if m > 9 {
-		return fmt.Sprintf("%02d:%02d", m, s)
-	}
-
-	// M:SS
-	return fmt.Sprintf("%d:%02d", m, s)
-}
-
-var parseDateRFC1123Z = func(t *time.Time) string {
-	if t != nil && !t.IsZero() {
-		return t.Format(time.RFC1123Z)
-	}
-	return time.Now().UTC().Format(time.RFC1123Z)
 }
