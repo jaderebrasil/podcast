@@ -2,6 +2,12 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/eduncan911/podcast v1.4.2 h1:S+fsUlbR2ULFou2Mc52G/MZI8JVJHedbxLQnoA+MY/w=
+github.com/eduncan911/podcast v1.4.2/go.mod h1:mSxiK1z5KeNO0YFaQ3ElJlUZbbDV9dA7R9c1coeeXkc=
+github.com/jaderebrasil/podcast v1.3.1-0.20200309012455-cb295403b75f h1:CeXGudrholffV+ZwV+WBDkch61Rq3PWo419kVI8mArc=
+github.com/jaderebrasil/podcast v1.3.1-0.20200309012455-cb295403b75f/go.mod h1:bONgBrMzW2lP8hY014hqrGAY7VXox5c6Jxq5Hw9NBCE=
+github.com/jaderebrasil/podcast v1.3.1-0.20200309014551-a382e56c2d70 h1:j3cuoHK9cn/m7s6/hnmoAKy+2IbTb2z2LoXTdA6ni20=
+github.com/jaderebrasil/podcast v1.3.1-0.20200309014551-a382e56c2d70/go.mod h1:2EBLQLHvUSjE6Qp083ar6Ue/eHPBZlZGAEa3oEEM1Pg=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=

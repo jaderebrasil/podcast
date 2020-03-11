@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/eduncan911/podcast"
+	"github.com/jaderebrasil/podcast"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +27,7 @@ func TestNewNonNils(t *testing.T) {
 	// assert
 	assert.EqualValues(t, ti, p.Title)
 	assert.EqualValues(t, l, p.Link)
-	assert.EqualValues(t, d, p.Description)
+	assert.EqualValues(t, d, p.Description.Text)
 	assert.True(t, createdDate.Format(time.RFC1123Z) >= p.PubDate)
 	assert.True(t, updatedDate.Format(time.RFC1123Z) >= p.LastBuildDate)
 }
@@ -45,7 +45,7 @@ func TestNewNils(t *testing.T) {
 	now := time.Now().UTC().Format(time.RFC1123Z)
 	assert.EqualValues(t, ti, p.Title)
 	assert.EqualValues(t, l, p.Link)
-	assert.EqualValues(t, d, p.Description)
+	assert.EqualValues(t, d, p.Description.Text)
 	// ensure time.Now().UTC() is set, or close to it
 	assert.True(t, now >= p.PubDate)
 	assert.True(t, now >= p.LastBuildDate)
@@ -150,7 +150,7 @@ func TestAddItemEmptyTitleDescription(t *testing.T) {
 	assert.EqualValues(t, 0, added)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Title")
-	assert.Contains(t, err.Error(), "Description")
+	assert.Contains(t, err.Error(), "ISummary")
 	assert.Contains(t, err.Error(), "required")
 }
 
@@ -159,7 +159,8 @@ func TestAddItemEmptyEnclosureURL(t *testing.T) {
 
 	// arrange
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "summary"}
+	i.AddDescription("description")
 	i.AddEnclosure("", podcast.MP3, 1)
 
 	// act
@@ -176,7 +177,8 @@ func TestAddItemEmptyEnclosureType(t *testing.T) {
 
 	// arrange
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "desc"}
+	i.AddDescription("description")
 	i.AddEnclosure("http://example.com/1.mp3", 99, 1)
 
 	// act
@@ -188,12 +190,31 @@ func TestAddItemEmptyEnclosureType(t *testing.T) {
 	assert.Contains(t, err.Error(), "Enclosure.Type is required")
 }
 
+func TestAddItemNilDescriptionAndSummary(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	p := podcast.New("title", "link", "description", nil, nil)
+	i := podcast.Item{Title: "title"}
+	i.AddEnclosure("", podcast.MP3, 1)
+
+	// act
+	added, err := p.AddItem(i)
+
+	// assert
+	assert.EqualValues(t, 0, added)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Title")
+	assert.Contains(t, err.Error(), "ISummary")
+	assert.Contains(t, err.Error(), "required")
+}
+
 func TestAddItemEmptyLink(t *testing.T) {
 	t.Parallel()
 
 	// arrange
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "desc"}
 
 	// act
 	added, err := p.AddItem(i)
@@ -209,7 +230,7 @@ func TestAddItemEnclosureLengthMin(t *testing.T) {
 
 	// arrange
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "desc"}
 	i.AddEnclosure("http://example.com/1.mp3", podcast.MP3, -1)
 
 	// act
@@ -227,7 +248,7 @@ func TestAddItemEnclosureNoLinkOverride(t *testing.T) {
 
 	// arrange
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "desc"}
 	i.AddEnclosure("http://example.com/1.mp3", podcast.MP3, -1)
 
 	// act
@@ -246,7 +267,7 @@ func TestAddItemEnclosureLinkPresentNoOverride(t *testing.T) {
 	// arrange
 	theLink := "http://someotherurl.com/story.html"
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "desc"}
 	i.Link = theLink
 	i.AddEnclosure("http://example.com/1.mp3", podcast.MP3, -1)
 
@@ -266,7 +287,7 @@ func TestAddItemNoEnclosureGUIDValid(t *testing.T) {
 	// arrange
 	theLink := "http://someotherurl.com/story.html"
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc"}
+	i := podcast.Item{Title: "title", ISummary: "desc"}
 	i.Link = theLink
 
 	// act
@@ -288,9 +309,9 @@ func TestAddItemWithEnclosureGUIDSet(t *testing.T) {
 	length := 3
 	p := podcast.New("title", "link", "description", nil, nil)
 	i := podcast.Item{
-		Title:       "title",
-		Description: "desc",
-		GUID:        theGUID,
+		Title:    "title",
+		ISummary: "desc",
+		GUID:     theGUID,
 	}
 	i.AddEnclosure(theLink, podcast.MP3, int64(length))
 
@@ -311,7 +332,7 @@ func TestAddItemAuthor(t *testing.T) {
 	// arrange
 	theAuthor := podcast.Author{Name: "Jane Doe", Email: "me@janedoe.com"}
 	p := podcast.New("title", "link", "description", nil, nil)
-	i := podcast.Item{Title: "title", Description: "desc", Link: "http://a.co/"}
+	i := podcast.Item{Title: "title", ISummary: "desc", Link: "http://a.co/"}
 	i.Author = &theAuthor
 
 	// act
@@ -332,7 +353,7 @@ func TestAddItemRootManagingEditorSetsAuthorIAuthor(t *testing.T) {
 	theAuthor := "me@janedoe.com"
 	p := podcast.New("title", "link", "description", nil, nil)
 	p.ManagingEditor = theAuthor
-	i := podcast.Item{Title: "title", Description: "desc", Link: "http://a.co/"}
+	i := podcast.Item{Title: "title", ISummary: "desc", Link: "http://a.co/"}
 
 	// act
 	added, err := p.AddItem(i)
@@ -351,7 +372,7 @@ func TestAddItemRootIAuthorSetsAuthorIAuthor(t *testing.T) {
 	// arrange
 	p := podcast.New("title", "link", "description", nil, nil)
 	p.IAuthor = "me@janedoe.com"
-	i := podcast.Item{Title: "title", Description: "desc", Link: "http://a.co/"}
+	i := podcast.Item{Title: "title", ISummary: "desc", Link: "http://a.co/"}
 
 	// act
 	added, err := p.AddItem(i)
@@ -397,7 +418,7 @@ func TestAddSubTitleTooLong(t *testing.T) {
 	assert.Len(t, p.ISubtitle, 64)
 }
 
-func TestAddSummaryTooLong(t *testing.T) {
+func TestAddDescriptionTooLong(t *testing.T) {
 	t.Parallel()
 
 	// arrange
@@ -406,19 +427,19 @@ func TestAddSummaryTooLong(t *testing.T) {
 		"desc",
 		"Link",
 		nil, nil)
-	summary := ""
+	desc := ""
 	for {
-		if len(summary) >= 4051 {
+		if len(desc) >= 4051 {
 			break
 		}
-		summary += "jax ss 7 "
+		desc += "jax ss 7 "
 	}
 
 	// act
-	p.AddSummary(summary)
+	p.AddDescription(desc)
 
 	// assert
-	assert.Len(t, p.ISummary.Text, 4000)
+	assert.Len(t, p.Description.Text, 4000)
 }
 
 func TestAddSummaryEmpty(t *testing.T) {
@@ -431,7 +452,7 @@ func TestAddSummaryEmpty(t *testing.T) {
 	p.AddSummary("")
 
 	// assert
-	assert.Nil(t, p.ISummary)
+	assert.Empty(t, p.ISummary)
 }
 
 type errWriter struct{}

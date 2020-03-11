@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/eduncan911/podcast"
+	"github.com/jaderebrasil/podcast"
 )
 
 func ExampleNew() {
@@ -14,7 +14,7 @@ func ExampleNew() {
 	// instantiate a new Podcast
 	p := podcast.New(ti, l, d, &pubDate, &updatedDate)
 
-	fmt.Println(p.Title, p.Link, p.Description, p.Language)
+	fmt.Println(p.Title, p.Link, p.Description.Text, p.Language)
 	fmt.Println(p.PubDate, p.LastBuildDate)
 	// Output:
 	// title link description en-us
@@ -72,11 +72,11 @@ func ExamplePodcast_AddItem() {
 	// create an Item
 	date := pubDate.AddDate(0, 0, 77)
 	item := podcast.Item{
-		Title:       "Episode 1",
-		Description: "Description for Episode 1",
-		ISubtitle:   "A simple episode 1",
-		PubDate:     &date,
+		Title:     "Episode 1",
+		ISubtitle: "A simple episode 1",
+		PubDate:   &date,
 	}
+	item.AddDescription("Description for Episode 1")
 	item.AddEnclosure(
 		"http://example.com/1.mp3",
 		podcast.MP3,
@@ -94,13 +94,13 @@ func ExamplePodcast_AddItem() {
 	}
 	pp := p.Items[0]
 	fmt.Println(
-		pp.GUID, pp.Title, pp.Link, pp.Description, pp.Author,
+		pp.GUID, pp.Title, pp.Link, pp.Description.Text, pp.Author,
 		pp.AuthorFormatted, pp.Category, pp.Comments, pp.Source,
 		pp.PubDate, pp.PubDateFormatted, *pp.Enclosure,
 		pp.IAuthor, pp.IDuration, pp.IExplicit, pp.IIsClosedCaptioned,
 		pp.IOrder, pp.ISubtitle, pp.ISummary)
 	// Output:
-	// http://example.com/1.mp3 Episode 1 http://example.com/1.mp3 Description for Episode 1 &{{ }  me@test.com (the name)}     2017-04-22 08:21:52 +0000 UTC Sat, 22 Apr 2017 08:21:52 +0000 {{ } http://example.com/1.mp3 183 183 audio/mpeg audio/mpeg} me@test.com (the name)     A simple episode 1 &{{ } See more at <a href="http://example.com">Here</a>}
+	// http://example.com/1.mp3 Episode 1 http://example.com/1.mp3 Description for Episode 1 &{{ }  me@test.com (the name)}     2017-04-22 08:21:52 +0000 UTC Sat, 22 Apr 2017 08:21:52 +0000 {{ } http://example.com/1.mp3 183 183 audio/mpeg audio/mpeg} me@test.com (the name)     A simple episode 1 See more at <a href="http://example.com">Here</a>
 }
 
 func ExamplePodcast_AddLastBuildDate() {
@@ -134,8 +134,8 @@ func ExamplePodcast_AddSummary() {
 See more at our website: <a href="http://example.com">example.com</a>
 `)
 
-	if p.ISummary != nil {
-		fmt.Println(p.ISummary.Text)
+	if p.ISummary != "" {
+		fmt.Println(p.ISummary)
 	}
 	// Output:
 	// A very cool podcast with a long summary!
@@ -147,12 +147,14 @@ func ExamplePodcast_Bytes() {
 	p := podcast.New(
 		"eduncan911 Podcasts",
 		"http://eduncan911.com/",
-		"An example Podcast",
+		"",
 		&pubDate, &updatedDate,
 	)
+
+	p.AddSummary("An example Podcast")
 	p.AddAuthor("Jane Doe", "me@janedoe.com")
 	p.AddImage("http://janedoe.com/i.jpg")
-	p.AddSummary(`A very cool podcast with a long summary using Bytes()!
+	p.AddDescription(`A very cool podcast with a long summary using Bytes()!
 
 See more at our website: <a href="http://example.com">example.com</a>
 `)
@@ -162,10 +164,10 @@ See more at our website: <a href="http://example.com">example.com</a>
 		d := pubDate.AddDate(0, 0, int(i+3))
 
 		item := podcast.Item{
-			Title:       "Episode " + n,
-			Link:        "http://example.com/" + n + ".mp3",
-			Description: "Description for Episode " + n,
-			PubDate:     &d,
+			Title:    "Episode " + n,
+			Link:     "http://example.com/" + n + ".mp3",
+			ISummary: "Description for Episode " + n,
+			PubDate:  &d,
 		}
 		if _, err := p.AddItem(item); err != nil {
 			fmt.Println(item.Title, ": error", err.Error())
@@ -182,7 +184,10 @@ See more at our website: <a href="http://example.com">example.com</a>
 	//   <channel>
 	//     <title>eduncan911 Podcasts</title>
 	//     <link>http://eduncan911.com/</link>
-	//     <description>An example Podcast</description>
+	//     <description><![CDATA[A very cool podcast with a long summary using Bytes()!
+
+	// See more at our website: <a href="http://example.com">example.com</a>
+	// ]]></description>
 	//     <generator>go podcast v1.3.1 (github.com/eduncan911/podcast)</generator>
 	//     <language>en-us</language>
 	//     <lastBuildDate>Mon, 06 Feb 2017 08:21:52 +0000</lastBuildDate>
@@ -194,27 +199,24 @@ See more at our website: <a href="http://example.com">example.com</a>
 	//       <link>http://eduncan911.com/</link>
 	//     </image>
 	//     <itunes:author>me@janedoe.com (Jane Doe)</itunes:author>
-	//     <itunes:summary><![CDATA[A very cool podcast with a long summary using Bytes()!
-	//
-	// See more at our website: <a href="http://example.com">example.com</a>
-	// ]]></itunes:summary>
+	//     <itunes:summary>An example Podcast</itunes:summary>
 	//     <itunes:image href="http://janedoe.com/i.jpg"></itunes:image>
 	//     <item>
 	//       <guid>http://example.com/5.mp3</guid>
 	//       <title>Episode 5</title>
 	//       <link>http://example.com/5.mp3</link>
-	//       <description>Description for Episode 5</description>
 	//       <pubDate>Sun, 12 Feb 2017 08:21:52 +0000</pubDate>
 	//       <itunes:author>me@janedoe.com (Jane Doe)</itunes:author>
+	//       <itunes:summary>Description for Episode 5</itunes:summary>
 	//       <itunes:image href="http://janedoe.com/i.jpg"></itunes:image>
 	//     </item>
 	//     <item>
 	//       <guid>http://example.com/6.mp3</guid>
 	//       <title>Episode 6</title>
 	//       <link>http://example.com/6.mp3</link>
-	//       <description>Description for Episode 6</description>
 	//       <pubDate>Mon, 13 Feb 2017 08:21:52 +0000</pubDate>
 	//       <itunes:author>me@janedoe.com (Jane Doe)</itunes:author>
+	//       <itunes:summary>Description for Episode 6</itunes:summary>
 	//       <itunes:image href="http://janedoe.com/i.jpg"></itunes:image>
 	//     </item>
 	//   </channel>
@@ -224,9 +226,9 @@ See more at our website: <a href="http://example.com">example.com</a>
 func ExampleItem_AddPubDate() {
 	p := podcast.New("title", "link", "description", nil, nil)
 	i := podcast.Item{
-		Title:       "item title",
-		Description: "item desc",
-		Link:        "item link",
+		Title:    "item title",
+		ISummary: "item desc",
+		Link:     "item link",
 	}
 	d := pubDate.AddDate(0, 0, -11)
 
@@ -252,9 +254,9 @@ func ExampleItem_AddPubDate() {
 
 func ExampleItem_AddDuration() {
 	i := podcast.Item{
-		Title:       "item title",
-		Description: "item desc",
-		Link:        "item link",
+		Title:    "item title",
+		ISummary: "item desc",
+		Link:     "item link",
 	}
 	d := int64(533)
 

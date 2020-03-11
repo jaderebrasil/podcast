@@ -1,34 +1,35 @@
 package podcast_test
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/eduncan911/podcast"
+	"github.com/jaderebrasil/podcast"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestItemAddSummaryTooLong(t *testing.T) {
+func TestItemAddDescriptionTooLong(t *testing.T) {
 	t.Parallel()
 
 	// arrange
 	i := podcast.Item{
 		Title:       "item.title",
-		Description: "item.desc",
+		Description: &podcast.Description{Text: "item.desc"},
 		Link:        "http://example.com/article.html",
 	}
-	summary := ""
+	desc := ""
 	for {
-		if len(summary) >= 4051 {
+		if len(desc) >= 4051 {
 			break
 		}
-		summary += "abc ss 5 "
+		desc += "abc ss 5 "
 	}
 
 	// act
-	i.AddSummary(summary)
-
+	i.AddDescription(desc)
+	fmt.Print(i.Description.Text)
 	// assert
-	assert.Len(t, i.ISummary.Text, 4000)
+	assert.Len(t, i.Description.Text, 4000)
 }
 
 func TestItemAddImageEmptyUrl(t *testing.T) {
@@ -37,7 +38,7 @@ func TestItemAddImageEmptyUrl(t *testing.T) {
 	// arrange
 	i := podcast.Item{
 		Title:       "item.title",
-		Description: "item.desc",
+		Description: &podcast.Description{Text: "item.desc"},
 		Link:        "http://example.com/article.html",
 	}
 
@@ -54,7 +55,7 @@ func TestItemAddDurationZero(t *testing.T) {
 	// arrange
 	i := podcast.Item{
 		Title:       "item.title",
-		Description: "item.desc",
+		Description: &podcast.Description{Text: "item.desc"},
 		Link:        "http://example.com/article.html",
 	}
 	d := int64(0)
@@ -72,7 +73,7 @@ func TestItemAddDurationLessThanZero(t *testing.T) {
 	// arrange
 	i := podcast.Item{
 		Title:       "item.title",
-		Description: "item.desc",
+		Description: &podcast.Description{Text: "item.desc"},
 		Link:        "http://example.com/article.html",
 	}
 	d := int64(-13)

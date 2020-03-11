@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/eduncan911/podcast"
+	"github.com/jaderebrasil/podcast"
 )
 
 func Example_httpHandlers() {
@@ -37,11 +37,11 @@ func Example_httpHandlers() {
 
 			// create an Item
 			item := podcast.Item{
-				Title:       "Episode " + n,
-				Link:        "http://example.com/" + n + ".mp3",
-				Description: "Description for Episode " + n,
-				PubDate:     &d,
+				Title:   "Episode " + n,
+				Link:    "http://example.com/" + n + ".mp3",
+				PubDate: &d,
 			}
+			item.AddDescription("Description for Episode " + n)
 			item.AddImage("http://example.com/episode-" + n + ".png")
 			item.AddSummary(`item <a href="http://example.com">example.com</a>`)
 			// add a Download to the Item
@@ -72,12 +72,12 @@ func Example_httpHandlers() {
 	httpHandler(rr, nil)
 	os.Stdout.Write(rr.Body.Bytes())
 	// Output:
-	// <?xml version="1.0" encoding="UTF-8"?>
+	// 	<?xml version="1.0" encoding="UTF-8"?>
 	// <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
 	//   <channel>
 	//     <title>eduncan911 Podcasts</title>
 	//     <link>http://eduncan911.com/</link>
-	//     <description>An example Podcast</description>
+	//     <description><![CDATA[An example Podcast]]></description>
 	//     <generator>go podcast v1.3.1 (github.com/eduncan911/podcast)</generator>
 	//     <language>en-us</language>
 	//     <lastBuildDate>Mon, 06 Feb 2017 08:21:52 +0000</lastBuildDate>
@@ -90,30 +90,30 @@ func Example_httpHandlers() {
 	//     </image>
 	//     <atom:link href="http://eduncan911.com/feed.rss" rel="self" type="application/rss+xml"></atom:link>
 	//     <itunes:author>me@janedoe.com (Jane Doe)</itunes:author>
-	//     <itunes:summary><![CDATA[link <a href="http://example.com">example.com</a>]]></itunes:summary>
+	//     <itunes:summary>link &lt;a href=&#34;http://example.com&#34;&gt;example.com&lt;/a&gt;</itunes:summary>
 	//     <itunes:image href="http://janedoe.com/i.jpg"></itunes:image>
 	//     <itunes:explicit>no</itunes:explicit>
 	//     <item>
 	//       <guid>http://e.com/1.mp3</guid>
 	//       <title>Episode 1</title>
 	//       <link>http://example.com/1.mp3</link>
-	//       <description>Description for Episode 1</description>
 	//       <pubDate>Sun, 05 Feb 2017 08:21:52 +0000</pubDate>
 	//       <enclosure url="http://e.com/1.mp3" length="110" type="audio/mpeg"></enclosure>
 	//       <itunes:author>me@janedoe.com (Jane Doe)</itunes:author>
-	//       <itunes:summary><![CDATA[item <a href="http://example.com">example.com</a>]]></itunes:summary>
+	//       <itunes:summary>item &lt;a href=&#34;http://example.com&#34;&gt;example.com&lt;/a&gt;</itunes:summary>
 	//       <itunes:image href="http://example.com/episode-1.png"></itunes:image>
+	//       <description><![CDATA[Description for Episode 1]]></description>
 	//     </item>
 	//     <item>
 	//       <guid>http://e.com/2.mp3</guid>
 	//       <title>Episode 2</title>
 	//       <link>http://example.com/2.mp3</link>
-	//       <description>Description for Episode 2</description>
 	//       <pubDate>Mon, 06 Feb 2017 08:21:52 +0000</pubDate>
 	//       <enclosure url="http://e.com/2.mp3" length="165" type="audio/mpeg"></enclosure>
 	//       <itunes:author>me@janedoe.com (Jane Doe)</itunes:author>
-	//       <itunes:summary><![CDATA[item <a href="http://example.com">example.com</a>]]></itunes:summary>
+	//       <itunes:summary>item &lt;a href=&#34;http://example.com&#34;&gt;example.com&lt;/a&gt;</itunes:summary>
 	//       <itunes:image href="http://example.com/episode-2.png"></itunes:image>
+	//       <description><![CDATA[Description for Episode 2]]></description>
 	//     </item>
 	//   </channel>
 	// </rss>
@@ -142,11 +142,11 @@ func Example_ioWriter() {
 
 		// create an Item
 		item := podcast.Item{
-			Title:       "Episode " + n,
-			Description: "Description for Episode " + n,
-			ISubtitle:   "A simple episode " + n,
-			PubDate:     &d,
+			Title:     "Episode " + n,
+			ISubtitle: "A simple episode " + n,
+			PubDate:   &d,
 		}
+		item.AddDescription("Description for Episode " + n)
 		item.AddImage("http://example.com/episode-" + n + ".png")
 		item.AddSummary(`item k <a href="http://example.com">example.com</a>`)
 		// add a Download to the Item
@@ -164,12 +164,12 @@ func Example_ioWriter() {
 	}
 
 	// Output:
-	// <?xml version="1.0" encoding="UTF-8"?>
+	// 	<?xml version="1.0" encoding="UTF-8"?>
 	// <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
 	//   <channel>
 	//     <title>Sample Podcasts</title>
 	//     <link>http://example.com/</link>
-	//     <description>An example Podcast</description>
+	//     <description><![CDATA[An example Podcast]]></description>
 	//     <generator>go podcast v1.3.1 (github.com/eduncan911/podcast)</generator>
 	//     <language>en-us</language>
 	//     <lastBuildDate>Mon, 06 Feb 2017 08:21:52 +0000</lastBuildDate>
@@ -183,31 +183,31 @@ func Example_ioWriter() {
 	//     <atom:link href="http://example.com/atom.rss" rel="self" type="application/rss+xml"></atom:link>
 	//     <itunes:author>jane.doe@example.com (Jane Doe)</itunes:author>
 	//     <itunes:subtitle>A simple Podcast</itunes:subtitle>
-	//     <itunes:summary><![CDATA[link <a href="http://example.com">example.com</a>]]></itunes:summary>
+	//     <itunes:summary>link &lt;a href=&#34;http://example.com&#34;&gt;example.com&lt;/a&gt;</itunes:summary>
 	//     <itunes:image href="http://example.com/podcast.jpg"></itunes:image>
 	//     <item>
 	//       <guid>http://example.com/9.mp3</guid>
 	//       <title>Episode 9</title>
 	//       <link>http://example.com/9.mp3</link>
-	//       <description>Description for Episode 9</description>
 	//       <pubDate>Mon, 13 Feb 2017 08:21:52 +0000</pubDate>
 	//       <enclosure url="http://example.com/9.mp3" length="550" type="audio/mpeg"></enclosure>
 	//       <itunes:author>jane.doe@example.com (Jane Doe)</itunes:author>
 	//       <itunes:subtitle>A simple episode 9</itunes:subtitle>
-	//       <itunes:summary><![CDATA[item k <a href="http://example.com">example.com</a>]]></itunes:summary>
+	//       <itunes:summary>item k &lt;a href=&#34;http://example.com&#34;&gt;example.com&lt;/a&gt;</itunes:summary>
 	//       <itunes:image href="http://example.com/episode-9.png"></itunes:image>
+	//       <description><![CDATA[Description for Episode 9]]></description>
 	//     </item>
 	//     <item>
 	//       <guid>http://example.com/10.mp3</guid>
 	//       <title>Episode 10</title>
 	//       <link>http://example.com/10.mp3</link>
-	//       <description>Description for Episode 10</description>
 	//       <pubDate>Tue, 14 Feb 2017 08:21:52 +0000</pubDate>
 	//       <enclosure url="http://example.com/10.mp3" length="605" type="audio/mpeg"></enclosure>
 	//       <itunes:author>jane.doe@example.com (Jane Doe)</itunes:author>
 	//       <itunes:subtitle>A simple episode 10</itunes:subtitle>
-	//       <itunes:summary><![CDATA[item k <a href="http://example.com">example.com</a>]]></itunes:summary>
+	//       <itunes:summary>item k &lt;a href=&#34;http://example.com&#34;&gt;example.com&lt;/a&gt;</itunes:summary>
 	//       <itunes:image href="http://example.com/episode-10.png"></itunes:image>
+	//       <description><![CDATA[Description for Episode 10]]></description>
 	//     </item>
 	//   </channel>
 	// </rss>

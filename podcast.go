@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -270,8 +271,13 @@ func (p *Podcast) AddImage(url string) {
 //
 func (p *Podcast) AddItem(i Item) (int, error) {
 	// initial guards for required fields
-	if len(i.Title) == 0 || len(i.Description.Text) == 0 {
-		return len(p.Items), errors.New("Title and Description are required")
+	if len(i.Title) == 0 || len(i.ISummary) == 0 {
+		if i.Description != nil && len(i.Description.Text) > 0 {
+			i.ISummary = strings.Split(i.Description.Text, "\n")[0]
+		}
+		if len(i.ISummary) == 0 {
+			return len(p.Items), errors.New("Title and ISummary are required")
+		}
 	}
 	if i.Enclosure != nil {
 		if len(i.Enclosure.URL) == 0 {
